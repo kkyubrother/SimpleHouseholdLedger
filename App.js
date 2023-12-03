@@ -8,6 +8,7 @@ import {
   TextInput,
   Pressable,
   Alert,
+  StatusBar as PlatformStatusBar,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
@@ -170,7 +171,6 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text> </Text>
       <View style={styles.textContainer}>
         <Pressable
           style={styles.textContainer}
@@ -253,6 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: PlatformStatusBar.currentHeight,
   },
   titleText: {
     fontSize: 28,

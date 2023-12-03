@@ -5,10 +5,11 @@
 * [React](https://react.dev/)
 * [Expo](https://expo.dev/)
 
-## 🚩Ver.1.0.2을 만들며 성장한 점
+## 🚩Ver.1.0.3을 만들며 성장한 점
 * Expo를 통한 안드로이드 앱 제작
 * Async Storage를 통한 데이터 관리
 * DatePicker를 통한 날짜 수정
+* CSS를 통해 MUI의 느낌과 비슷하도록 구성
 
 ## ✨Ver.2.0.0을 만들면 해보고 싶은 것
 * 데이터 내보내기 및 들여오기

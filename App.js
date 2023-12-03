@@ -9,6 +9,7 @@ import {
   Pressable,
   Alert,
   StatusBar as PlatformStatusBar,
+  ToastAndroid,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
@@ -99,7 +100,8 @@ export default function App() {
     }
   };
   const handleAddLog = async () => {
-    if (!amount.replace(/[^0-9]/g, "")) return;
+    if (!amount.replace(/[^0-9]/g, ""))
+      return ToastAndroid.show("올바른 금액을 입력하세요", ToastAndroid.SHORT);
     await handleSaveLog(new Date(), Number(amount.replace(/[^0-9]/g, "")));
     setAmount("");
     setLogs(await handleLoadLogs());
@@ -169,45 +171,49 @@ export default function App() {
 
   const TOTAL_AMOUNT = logs.reduce((pv, cv) => pv + cv.amount, 0);
 
+  const view_title_text = `${TOTAL_AMOUNT.toLocaleString()} / ${target.toLocaleString()} `;
+  const view_title_sub_text = `(${
+    target > 0 ? (target - TOTAL_AMOUNT).toLocaleString() : "-"
+  })`;
+
   return (
     <View style={styles.container}>
-      <View style={styles.textContainer}>
+      <View style={styles.titleContainer}>
         <Pressable
-          style={styles.textContainer}
+          style={styles.titleContainer}
           onPress={() => setEdit(!isEdit)}
         >
-          <Text
-            style={styles.titleText}
-          >{`${target.toLocaleString()} / ${TOTAL_AMOUNT.toLocaleString()} `}</Text>
-          <Text>{`(${
-            target > 0 ? (target - TOTAL_AMOUNT).toLocaleString() : "-"
-          })`}</Text>
+          <Text style={styles.titleText}>{view_title_text}</Text>
+          <Text style={styles.titleSubText}>{view_title_sub_text}</Text>
         </Pressable>
       </View>
       {isEdit ? (
         <View style={styles.textInputContainer}>
           <TextInput
-            style={styles.textInputStyle}
+            style={styles.titleTextInput}
             placeholder={"금액 입력"}
             onChangeText={setMonthTotalAmount}
             value={`${target}`}
             numeric
             keyboardType={"numeric"}
           />
-          <Button
-            color={"#fa5035"}
-            title={"전체 삭제"}
-            onPress={handleDeleteAllLogs}
-          />
+          <View style={styles.titleDeleteContainer}>
+            <Pressable
+              onPress={handleDeleteAllLogs}
+              style={styles.titleDeleteButton}
+            >
+              <Text style={styles.titleDeleteText}>전체 삭제</Text>
+            </Pressable>
+          </View>
         </View>
       ) : null}
       <FlatList
         data={logs}
         renderItem={({ item }) => (
           <View style={styles.listContainer}>
-            <View>
+            <View style={styles.listDateView}>
               <Text
-                style={styles.item}
+                style={styles.listDateText}
                 onPress={handleOpenEditDate(item)}
               >{`${item.date.toLocaleDateString()}`}</Text>
             </View>
@@ -218,13 +224,11 @@ export default function App() {
             </View>
             <View>
               <Button
-                color={"#fa5035"}
+                color={"#f50057"}
                 title={"삭제"}
                 onPress={createTwoButtonAlert(
                   item.id,
-                  `${item.date.toLocaleDateString()} ${
-                    item.amount
-                  }\n삭제하겠습니까?`,
+                  `${item.date.toLocaleDateString()} ${item.amount.toLocaleString()}원\n삭제하겠습니까?`,
                 )}
               />
             </View>
@@ -240,7 +244,12 @@ export default function App() {
           numeric
           keyboardType={"numeric"}
         />
-        <Button style={styles.button} title={"추가"} onPress={handleAddLog} />
+
+        <View style={styles.textButtonContainer}>
+          <Pressable onPress={handleAddLog} style={styles.titleDeleteButton}>
+            <Text style={styles.titleDeleteText}>추가</Text>
+          </Pressable>
+        </View>
       </View>
       <StatusBar style="auto" />
     </View>
@@ -257,20 +266,61 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 28,
+    color: "#fff",
+  },
+  titleSubText: {
+    color: "#fff",
+  },
+  titleTextInput: {
+    backgroundColor: "#e8e8e8",
+    padding: 16,
+    flexGrow: 14,
+    fontSize: 18,
+    borderBottomWidth: 2,
+    borderBottomColor: "#4dabf5",
+  },
+  titleDeleteContainer: {
+    flexGrow: 1,
+    backgroundColor: "#f50057",
+    alignItems: "center",
+    height: "100%",
+    display: "flex",
+  },
+  titleDeleteButton: {
+    display: "flex",
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingTop: 16,
+  },
+  titleDeleteText: {
+    fontSize: 18,
+    color: "#fff",
   },
   listContainer: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 12,
-    width: "80%",
+    width: "85%",
     marginLeft: 12,
   },
+  listDateView: {},
+  listDateText: {
+    fontSize: 24,
+    color: "#1769aa",
+  },
   listAmountViewContainer: {
-    // display: "flex",
     flex: 0.8,
     flexDirection: "row",
     justifyContent: "flex-end",
+  },
+  titleContainer: {
+    height: 64,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#2196f3",
+    justifyContent: "center",
+    width: "100%",
   },
   textContainer: {
     flexDirection: "row",
@@ -285,9 +335,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   textInputStyle: {
-    backgroundColor: "#dde8c9",
     padding: 16,
-    flexGrow: 7,
+    flexGrow: 14,
+    fontSize: 18,
+    borderBottomWidth: 2,
+    borderBottomColor: "#4dabf5",
+    backgroundColor: "#e8e8e8",
+  },
+  textButtonContainer: {
+    flexGrow: 1,
+    backgroundColor: "#1769aa",
+    alignItems: "center",
+    height: "100%",
+    display: "flex",
   },
   item: {
     fontSize: 24,
